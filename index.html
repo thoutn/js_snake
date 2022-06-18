@@ -7,12 +7,19 @@
     <title>Snake</title>
     <style>
         body {
-            background: #7fc97c;
+            background: #b6e0b5/*#7fc97c*/;
             text-align: center;
         }
 
         canvas {
-            border: 10px solid #c67cc9;
+            border: 10px solid 	#dfb5e0 /*#c67cc9*/;
+        }
+
+        h2 { 
+            margin-top: 0;
+            font-size: 2em;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -20,9 +27,12 @@
 <body>
     <canvas width="600" height="600"></canvas>
 
+    <h2>0</h2>
+
     <script>
         // Canvas
         const canvas = document.querySelector('canvas');
+        const title = document.querySelector('h2');
         const ctx = canvas.getContext('2d');
 
 
@@ -35,6 +45,29 @@
 
         let snakeVelX = 1;
         let snakeVelY = 0;
+
+
+        // Grid
+        const tileCountY = canvas.height / snakeSize; 
+        const tileCountX = canvas.width / snakeSize;
+
+
+        // Food
+        let genFoodPos = function() {
+            foodPosX = Math.floor(Math.random() * tileCountX) * snakeSize;
+            foodPosY = Math.floor(Math.random() * tileCountY) * snakeSize;
+        }
+
+        genFoodPos();
+
+
+        // score
+        let score = 0; 
+        let hitPoint = 20; 
+
+
+        // game
+        let fps = 5;
 
 
         // Snake and wall collision
@@ -57,23 +90,31 @@
         }
 
 
+        // Snake and food collision
+        let checkFoodCollision = function() {
+            if (snakePosX === foodPosX && snakePosY === foodPosY) {
+                genFoodPos();
+
+                score ++;
+            }
+        }
+
+
         // Move snake
         let moveSnake = function() {
             snakePosX += snakeVelX * snakeSpeed; 
             snakePosY += snakeVelY * snakeSpeed; 
 
             checkWallCollision();
+            checkFoodCollision();
         }
 
 
         // Draw grid
         let drawGrid = function() {
-            let tileCountY = canvas.height / snakeSize; 
-            let tileCountX = canvas.width / snakeSize;
-
             for (let i = 0; i < tileCountY; i++) {
                 for (let j = 0; j < tileCountX; j++) {
-                    drawRect(j*snakeSize, i*snakeSize, snakeSize - 1, snakeSize - 1, 'white');
+                    drawRect(j*snakeSize, i*snakeSize, snakeSize - 1, snakeSize - 1, '#f9f9f9');
                 }
             }
         }
@@ -82,13 +123,19 @@
         // Draw game frame
         let drawGameFrame = function() {
             // background
-            drawRect(0, 0, canvas.width, canvas.height, '#c67cc9');
+            drawRect(0, 0, canvas.width, canvas.height, '#dfb5e0');
 
             // grid
             drawGrid();
 
             // snake
             drawRect(snakePosX, snakePosY, snakeSize, snakeSize, 'black');
+
+            // food
+            drawRect(foodPosX, foodPosY, snakeSize - 1, snakeSize - 1, '#b5b6e0');
+
+            // score
+            title.textContent = score * hitPoint; 
         }
 
 
@@ -103,28 +150,28 @@
         let checkKeyPush = function(event) {
             switch (event.key) {
                 case 'ArrowUp':
-                    if (snakeVelY != 1 && !isEventDetected) {
+                    if (snakeVelY !== 1 && !isEventDetected) {
                         snakeVelY = -1;
                         snakeVelX = 0; 
                         isEventDetected = true;
                     }
                     break;
                 case 'ArrowDown':
-                    if (snakeVelY != -1 && !isEventDetected) {
+                    if (snakeVelY !== -1 && !isEventDetected) {
                         snakeVelY = 1;
                         snakeVelX = 0; 
                         isEventDetected = true;
                     }
                     break;
                 case 'ArrowLeft':
-                    if (snakeVelX != 1 && !isEventDetected) {
+                    if (snakeVelX !== 1 && !isEventDetected) {
                         snakeVelX = -1; 
                         snakeVelY = 0;
                         isEventDetected = true;
                     }
                     break;
                 case 'ArrowRight':
-                    if (snakeVelX != -1 && !isEventDetected) {
+                    if (snakeVelX !== -1 && !isEventDetected) {
                         snakeVelX = 1;
                         snakeVelY = 0;
                         isEventDetected = true;
@@ -148,7 +195,7 @@
             moveSnake();
 
             //requestAnimationFrame(runGame);
-            setTimeout(runGame, 500);
+            setTimeout(runGame, 1000 / fps);
         }
 
         runGame();
