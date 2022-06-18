@@ -5,8 +5,71 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake</title>
+    <style>
+        body {
+            background: #7fc97c;
+            text-align: center;
+        }
+
+        canvas {
+            border: 10px solid #c67cc9;
+        }
+    </style>
 </head>
+
 <body>
     <canvas width="600" height="600"></canvas>
+
+    <script>
+        // Canvas
+        const canvas = document.querySelector('canvas');
+        const ctx = canvas.getContext('2d');
+
+
+        // Snake
+        const snakeSize = 50;
+        let snakeSpeed = 5; 
+        let snakePoxX = 0;
+        let snakePosY = canvas.height / 2 - snakeSize / 2;
+
+
+        // Move snake
+        let moveSnake = function() {
+            snakePoxX += snakeSpeed; 
+            
+            if (snakePoxX > canvas.width) {
+                snakePoxX = 0;
+            }
+        }
+
+
+        // Draw game frame
+        let drawGameFrame = function() {
+            // background
+            drawRect(0, 0, canvas.width, canvas.height, 'white');
+
+            // snake
+            drawRect(snakePoxX, snakePosY, snakeSize, snakeSize, 'black');
+        }
+
+
+        // Draw rectangle
+        let drawRect = function(x, y, w, h, colour) {
+            ctx.fillStyle = colour;
+            ctx.fillRect(x, y, w, h);
+        }
+
+
+        // Game loop
+        let runGame = function() {
+            drawGameFrame();
+            moveSnake();
+
+            requestAnimationFrame(runGame);
+        }
+
+        runGame();
+
+    </script>
 </body>
 </html>
