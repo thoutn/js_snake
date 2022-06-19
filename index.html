@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake</title>
+    <title>🐍 Snake</title>
     <style>
         body {
             background: #b6e0b5/*#7fc97c*/;
@@ -45,8 +45,11 @@
         // Frame per sec
         let fps = 5;
 
-        // Limits event to one per frame update
+        // Limits event to one per frame-update
         let isEventDetected = false; 
+
+        // Condition for self-collision
+        let isGameOver = false;
 
         // Score
         let score = 0; 
@@ -113,8 +116,19 @@
         }
 
 
+        let checkSelfCollision = function() {
+            snake.tail.forEach(part => {
+                if (snake.x === part.x && snake.y === part.y) {
+                    isGameOver = true;
+                }
+            });
+        }
+
+
         // Move snake
         let moveSnake = function() {
+            checkSelfCollision();
+            
             snake.tail.unshift({x: snake.x, y: snake.y});
             snake.x += snake.velX * snake.speed; 
             snake.y += snake.velY * snake.speed; 
@@ -195,9 +209,31 @@
                         isEventDetected = true;
                     }
                     break;
+                case 'Enter': // to restart game
+                    if (isGameOver) {
+                        location.reload();
+                    }
+                    break; 
                 default:
                     break;
             }
+        }
+
+
+        let sayGameOver = function() {
+            let lineHeight = 70; 
+            ctx.strokeStyle = 'grey';
+            ctx.fillStyle = 'white';
+            ctx.font = '80px Arial black';
+            ctx.textAlign = 'center';
+            ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2); 
+            ctx.strokeText('Game Over', canvas.width / 2, canvas.height / 2);
+            
+            ctx.fillStyle = 'grey';
+            ctx.font = '40px Arial';
+            ctx.fillText('Your score is ' + score*pointPerFood, canvas.width / 2, canvas.height / 2 + lineHeight); 
+
+            title.textContent = '💀  Hit "Enter" to restart  💀';
         }
 
 
@@ -207,12 +243,16 @@
 
         // Game loop
         let runGame = function() {
-            isEventDetected = false; 
-            drawGameFrame();
-            moveSnake();
+            if (!isGameOver) {
+                isEventDetected = false; 
+                drawGameFrame();
+                moveSnake();
 
-            //requestAnimationFrame(runGame);
-            setTimeout(runGame, 1000 / fps);
+                //requestAnimationFrame(runGame);
+                setTimeout(runGame, 1000 / fps);
+            } else {
+                sayGameOver();
+            }
         }
 
         runGame();
