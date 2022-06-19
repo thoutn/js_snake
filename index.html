@@ -38,10 +38,14 @@
 
         // Snake
         const snakeSize = 30;
-        let snakeSpeed = 30; 
+        let snakeSpeed = snakeSize; 
 
-        let snakePosX = 0;
-        let snakePosY = canvas.height / 2; //- snakeSize / 2;
+        //let snakePosX = 0;
+        //let snakePosY = canvas.height / 2; //- snakeSize / 2;
+
+        let yStartPos = canvas.height / 2; 
+        let snakePosX = [0, -snakeSize, -2*snakeSize];
+        let snakePosY = [yStartPos, yStartPos, yStartPos];
 
         let snakeVelX = 1;
         let snakeVelY = 0;
@@ -72,38 +76,41 @@
 
         // Snake and wall collision
         let checkWallCollision = function() {
-            if (snakePosX > canvas.width - snakeSize) {
-                snakePosX = 0;
+            if (snakePosX[0] > canvas.width - snakeSize) {
+                snakePosX[0] = 0;
             }
             
-            if (snakePosX < 0) {
-                snakePosX = canvas.width - snakeSize;
+            if (snakePosX[0] < 0) {
+                snakePosX[0] = canvas.width - snakeSize;
             }
 
-            if (snakePosY > canvas.height - snakeSize) {
-                snakePosY = 0;
+            if (snakePosY[0] > canvas.height - snakeSize) {
+                snakePosY[0] = 0;
             }
 
-            if (snakePosY < 0) {
-                snakePosY = canvas.height - snakeSize;
+            if (snakePosY[0] < 0) {
+                snakePosY[0] = canvas.height - snakeSize;
             }
         }
 
 
         // Snake and food collision
         let checkFoodCollision = function() {
-            if (snakePosX === foodPosX && snakePosY === foodPosY) {
+            if (snakePosX[0] === foodPosX && snakePosY[0] === foodPosY) {
                 genFoodPos();
 
                 score ++;
+            } else {
+                snakePosX.pop();
+                snakePosY.pop();
             }
         }
 
 
         // Move snake
         let moveSnake = function() {
-            snakePosX += snakeVelX * snakeSpeed; 
-            snakePosY += snakeVelY * snakeSpeed; 
+            snakePosX.unshift(snakePosX[0] + snakeVelX * snakeSpeed); 
+            snakePosY.unshift(snakePosY[0] + snakeVelY * snakeSpeed); 
 
             checkWallCollision();
             checkFoodCollision();
@@ -128,8 +135,13 @@
             // grid
             drawGrid();
 
-            // snake
-            drawRect(snakePosX, snakePosY, snakeSize, snakeSize, 'black');
+            // snake HEAD
+            drawRect(snakePosX[0], snakePosY[0], snakeSize, snakeSize, 'black');
+
+            // snake TAIL
+            for (let i = 1; i < snakePosX.length; i++) {
+                drawRect(snakePosX[i], snakePosY[i], snakeSize, snakeSize, '#4c4c4c');
+            }
 
             // food
             drawRect(foodPosX, foodPosY, snakeSize - 1, snakeSize - 1, '#b5b6e0');
